@@ -1,59 +1,62 @@
-"use client"; 
+'use client'
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';  // Use next/navigation for App Router
-import { useSession } from 'next-auth/react';
-import Form from "@components/Form";
+import { useState } from 'react'
+import { useRouter } from 'next/navigation' // Use next/navigation for App Router
+import { useSession } from 'next-auth/react'
+import Form from '@components/Form'
 
 const CreatePrompt = () => {
-  const [submitting, setSubmitting] = useState(false);
-  const { data: session } = useSession();
-  const router = useRouter();  // Initialize router from next/navigation
-  
-  const [post, setPost] = useState({
-    prompt: "",
-    tag: "",
-  });
+  const [submitting, setSubmitting] = useState(false)
+  const { data: session } = useSession()
+  const router = useRouter() // Initialize router from next/navigation
 
-  const createPrompt = async (e) => {
-    e.preventDefault();
+  const [post, setPost] = useState({
+    prompt: '',
+    tag: ''
+  })
+
+  const createPrompt = async e => {
+    e.preventDefault()
 
     if (!session || !session.user) {
-      console.log("User is not authenticated");
-      return; // Exit early if the user is not logged in
+      console.log('User is not authenticated')
+      return // Exit early if the user is not logged in
     }
 
-    setSubmitting(true);
+    setSubmitting(true)
 
     try {
       const response = await fetch('/api/prompt/new', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
         body: JSON.stringify({
           prompt: post.prompt,
           userId: session.user.id,
           tag: post.tag
         })
-      });
+      })
 
       if (response.ok) {
-        router.push('/');
+        router.push('/')
       }
     } catch (error) {
-      console.error("Failed to create prompt:", error);
+      console.error('Failed to create prompt:', error)
     } finally {
-      setSubmitting(false);
+      setSubmitting(false)
     }
-  };
+  }
 
   return (
     <Form
-      type="create"
+      type='create'
       post={post}
       setPost={setPost}
       submitting={submitting}
       handleSubmit={createPrompt}
     />
-  );
-};
+  )
+}
 
-export default CreatePrompt;
+export default CreatePrompt
